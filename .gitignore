@@ -1,0 +1,89 @@
+# Binários compilados do Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Arquivos de teste
+*.test
+
+# Arquivos de saída
+*.out
+
+# Dependency directories (remove the comment below to include it)
+vendor/
+
+# Go workspace file
+go.work
+
+# Arquivos de build
+/bin/
+/pkg/
+/dist/
+
+# Arquivos de configuração local
+.env
+.env.local
+.env.*.local
+config.local.yml
+config.local.yaml
+
+# Logs
+*.log
+logs/
+
+# Arquivos temporários
+*.tmp
+*.temp
+.tmp/
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker
+.dockerignore
+
+# Air (live reload tool)
+tmp/
+
+# Coverage files
+*.cover
+coverage.out
+coverage.html
+
+# Profiling files
+*.prof
+*.pprof
+
+# Database files (se usar SQLite local)
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.bak
+*.backup
+
+# Arquivos de certificados
+*.pem
+*.key
+*.crt
+*.cert
+
+# Arquivos de dados locais
+data/
+uploads/

@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres_url_shortener
+    environment:
+      POSTGRES_DB: url_shortener
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - url_shortener_network
+    restart: unless-stopped
+
+  redis:
+    image: redis:8
+    container_name: redis_url_shortener
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - url_shortener_network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # Opcional: Redis Commander para visualizar o Redis
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis_commander
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    networks:
+      - url_shortener_network
+    depends_on:
+      - redis
+    profiles:
+      - tools
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  url_shortener_network:
+    driver: bridge
