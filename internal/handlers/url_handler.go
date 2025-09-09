@@ -27,6 +27,7 @@ func (handler *URLHandler) CreateURL(ctx *gin.Context) {
 	resp, err := handler.service.CreateURL(req)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create URL: " + err.Error()})
+		return
 	}
 
 	ctx.JSON(http.StatusCreated, resp)
