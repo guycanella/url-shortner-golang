@@ -84,6 +84,7 @@ coverage.html
 *.key
 *.crt
 *.cert
+letsencrypt
 
 # Arquivos de dados locais
 data/
