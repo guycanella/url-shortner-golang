@@ -6,6 +6,9 @@ import (
 	"guycanella-url-shortner/internal/models"
 	"guycanella-url-shortner/internal/pkg/utils"
 	"guycanella-url-shortner/internal/repository"
+	"net"
+	"net/url"
+	"strings"
 	"time"
 )
 
@@ -30,6 +33,35 @@ func NewURLService(repo repository.URLRepository, cfg *config.Config) *urlServic
 }
 
 func (service *urlService) CreateURL(req models.CreateURLRequest) (*models.CreateURLResponse, error) {
+	// VALIDATION 1: NORMALIZE URLs
+	if !strings.HasPrefix(req.URL, "http://") ||
+		!strings.HasPrefix(req.URL, "https://") {
+		req.URL = "http://" + req.URL
+	}
+
+	// VALIDATION 2: URL PARSING
+	parsedUrl, erro := url.Parse(req.URL)
+	if erro != nil {
+		return nil, fmt.Errorf("invalid URL: %w", erro)
+	}
+
+	// VALIDATION 3: BLOCK PRIVATE IPs
+	ipAddrs, _ := net.LookupIP(parsedUrl.Hostname())
+	for _, ip := range ipAddrs {
+		if ip.IsLoopback() || ip.IsPrivate() {
+			return nil, fmt.Errorf("forbidden URL: private or local address")
+		}
+	}
+
+	// VALIDATION 4: DOMAINS BLACKLIST
+	blackList := []string{"malware.com", "phishing.site", "spam.example"}
+	hostname := parsedUrl.Hostname()
+	for _, banned := range blackList {
+		if strings.Contains(hostname, banned) {
+			return nil, fmt.Errorf("forbidden URL: blacklisted domain")
+		}
+	}
+
 	var shortCode string
 	var err error
 
