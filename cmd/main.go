@@ -38,7 +38,7 @@ func main() {
 	addr := fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port)
 	log.Printf("🚀 Server running at http://%s\n", addr)
 
-	if err := routes.Run(addr); err != nil {
+	if err := routes.Run(":" + cfg.Server.Port); err != nil {
 		log.Fatalf("❌ failed to start server: %v", err)
 	}
 }
