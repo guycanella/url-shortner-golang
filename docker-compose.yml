@@ -1,4 +1,33 @@
 services:
+  app:
+    build: .
+    container_name: url_shortener_app
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8080
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=url_shortener
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=
+    networks:
+      - url_shortener_network
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.urlshortener.rule=Host(`localhost`)" # In prod change for 'your-domain.com'
+      - "traefik.http.routers.urlshortener.entrypoints=web" # In prod change for 'websecure'
+      - "traefik.http.services.urlshortener.loadbalancer.server.port=8080"
+      # - "traefik.http.routers.urlshortener.tls.certresolver=myresolver" # Uncomment only when 'entrypoints=websecure'
+    # Don't expose the port directly - only via Traefik
+    # ports:
+    #   - "8080:8080"
   postgres:
     image: postgres:17
     container_name: postgres_url_shortener
@@ -42,6 +71,30 @@ services:
       - redis
     profiles:
       - tools
+
+  traefik:
+    image: traefik:v3.5.1
+    container_name: traefik
+    command:
+      - "--api.insecure=true"                       # Dashboard at http://localhost:8080
+      - "--providers.docker=true"                   # Service discovery via Docker
+      - "--providers.docker.exposedbydefault=false" # Just expose containers with labels
+      - "--entrypoints.web.address=:80"             # HTTP on port 80
+      - "--entrypoints.websecure.address=:443"      # HTTPS on port 443
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=seu-email@exemplo.com"  # ← CHANGE
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"  # staging - remove in prod
+    ports:
+      - "80:80"     # HTTP
+      - "443:443"   # HTTPS
+      - "8080:8080" # Dashboard Traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    networks:
+      - url_shortener_network
+    restart: unless-stopped
 
 volumes:
   postgres_data:
