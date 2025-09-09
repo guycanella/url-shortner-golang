@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"guycanella-url-shortner/internal/cache"
 	"guycanella-url-shortner/internal/config"
 	"guycanella-url-shortner/internal/models"
 	"guycanella-url-shortner/internal/pkg/utils"
@@ -105,6 +106,13 @@ func (service *urlService) CreateURL(req models.CreateURLRequest) (*models.Creat
 }
 
 func (service *urlService) GetOriginalURL(shortCode string) (*models.URL, error) {
+	cacheKey := "short:" + shortCode
+
+	val, err := cache.Client.Get(cache.Ctx, cacheKey).Result()
+	if err == nil {
+		return &models.URL{ShortCode: shortCode, OriginalUrl: val}, nil
+	}
+
 	url, err := service.repo.FindByShortCode(shortCode)
 	if err != nil {
 		return nil, err
@@ -112,6 +120,11 @@ func (service *urlService) GetOriginalURL(shortCode string) (*models.URL, error)
 
 	if !url.IsValid() {
 		return nil, fmt.Errorf("URL expired or inactive")
+	}
+
+	ttl := time.Until(url.ExpiresAt)
+	if ttl > 0 {
+		cache.Client.Set(cache.Ctx, cacheKey, url.OriginalUrl, ttl)
 	}
 
 	if err := service.repo.IncrementClickCount(shortCode); err != nil {
