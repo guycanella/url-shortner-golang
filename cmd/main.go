@@ -8,6 +8,7 @@ import (
 	"guycanella-url-shortner/internal/repository"
 	"guycanella-url-shortner/internal/services"
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,6 +27,23 @@ func main() {
 	repo := repository.NewURLRepository()
 	service := services.NewURLService(repo, cfg)
 	handler := handlers.NewURLHandler(service)
+
+	go func() {
+		ticker := time.NewTicker(1 * time.Minute)
+		defer ticker.Stop()
+
+		for range ticker.C {
+			affected, err := service.DeactivateExpired()
+			if err != nil {
+				log.Printf("❌ Error deactivating expired URLs: %v", err)
+				continue
+			}
+
+			if affected > 0 {
+				log.Printf("🧹 Deactivated %d expired URLs", affected)
+			}
+		}
+	}()
 
 	routes := gin.Default()
 
