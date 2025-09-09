@@ -6,6 +6,7 @@
 *.dylib
 
 # Arquivos de teste
+*.http
 *.test
 
 # Arquivos de saída
