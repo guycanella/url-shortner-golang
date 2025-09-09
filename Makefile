@@ -22,7 +22,7 @@ help: ## Show this help
 
 # Docker Commands
 up: ## Run the containers (postgres and redis)
-	@echo "$(GREEN)Running the0 containers...$(NC)"
+	@echo "$(GREEN)Running the containers...$(NC)"
 	$(DOCKER_COMPOSE) up -d postgres redis
 
 up-tools: ## Run the containers including tools (redis-commander)
@@ -66,7 +66,7 @@ build: ## Compile the application
 
 run: ## Run the application locally
 	@echo "$(GREEN)Running application...$(NC)"
-	$(GO_CMD) run cmd/server/main.go
+	$(GO_CMD) run cmd/main.go
 
 dev: docker-up deps ## Prepare the developer environment
 	@echo "$(GREEN)Developer environment ready!$(NC)"
