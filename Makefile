@@ -13,7 +13,7 @@ RED=\033[0;31m
 NC=\033[0m # No Color
 
 .PHONY: help up up-tools down ps logs postgres-log redis-logs clean restart deps \
-	build run dev test test-coverage db-migrate db-reset clean-files fmt lint
+	build run docker-run dev test test-coverage db-migrate db-reset clean-files fmt lint
 
 # Help
 help: ## Show this help
@@ -73,6 +73,10 @@ dev: docker-up deps ## Prepare the developer environment
 	@echo "$(YELLOW)PostgreSQL:$(NC) localhost:5432"
 	@echo "$(YELLOW)Redis:$(NC) localhost:6379"
 	@echo "$(YELLOW)To run the application:$(NC) make run"
+
+docker-run: ## Run the application locally
+	@echo "$(GREEN)Running Docker application...$(NC)"
+	$(DOCKER_COMPOSE) up --build
 
 test: ## Run the tests
 	@echo "$(GREEN)Running tests...$(NC)"
