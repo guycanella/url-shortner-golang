@@ -30,10 +30,11 @@ type RedisConfig struct {
 }
 
 type AppConfig struct {
-	BaseURL              string
-	DefaultExpirationMin int
-	ShortCodeLength      int
-	Environment          string
+	BaseURL                string
+	DefaultExpirationMin   int
+	ShortCodeLength        int
+	Environment            string
+	CleanupIntervalMinutes int
 }
 
 type Config struct {
@@ -86,10 +87,11 @@ func Load() *Config {
 			Port: getEnv("SERVER_PORT", "8080"),
 		},
 		App: AppConfig{
-			BaseURL:              getEnv("BASE_URL", "http://localhost:8080"),
-			DefaultExpirationMin: getEnvAsInt("DEFAULT_EXPIRATION_MINUTES", 1),
-			ShortCodeLength:      getEnvAsInt("SHORT_CODE_LENGTH", 8),
-			Environment:          getEnv("ENV", "development"),
+			BaseURL:                getEnv("BASE_URL", "http://localhost:8080"),
+			DefaultExpirationMin:   getEnvAsInt("DEFAULT_EXPIRATION_MINUTES", 1),
+			ShortCodeLength:        getEnvAsInt("SHORT_CODE_LENGTH", 8),
+			Environment:            getEnv("ENV", "development"),
+			CleanupIntervalMinutes: getEnvAsInt("CLEANUP_INTERVAL_MINUTES", 1),
 		},
 	}
 
