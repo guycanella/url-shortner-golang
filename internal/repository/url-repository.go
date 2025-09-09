@@ -140,7 +140,7 @@ func (repo *urlRepository) FindExpiredURLs() ([]models.URL, error) {
 	var urls []models.URL
 
 	err := repo.db.
-		Where("expires_at = ? AND is_active = ?", time.Now(), true).
+		Where("expires_at <= ? AND is_active = ?", time.Now(), true).
 		Find(&urls).
 		Error
 
