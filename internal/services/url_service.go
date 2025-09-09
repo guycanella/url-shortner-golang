@@ -12,7 +12,7 @@ import (
 type URLService interface {
 	CreateURL(req models.CreateURLRequest) (*models.CreateURLResponse, error)
 	GetOriginalURL(shortCode string) (*models.URL, error)
-	GetURLStats(shortCode string) (*models.CreateURLResponse, error)
+	GetURLStats(shortCode string) (*models.URLStatsResponse, error)
 	DeleteURL(id string) error
 	DeactivateExpired() (int64, error)
 }
