@@ -155,18 +155,44 @@ func (service *urlService) GetURLStats(shortCode string) (*models.URLStatsRespon
 
 func (service *urlService) DeleteURL(id string) error {
 	uuid, err := utils.ParseUUID(id)
-
 	if err != nil {
 		return err
 	}
 
-	return service.repo.Delete(uuid)
+	url, err := service.repo.FindByID(uuid)
+	if err != nil {
+		return err
+	}
+
+	if err := service.repo.Delete(uuid); err != nil {
+		return err
+	}
+
+	cacheKey := "short:" + url.ShortCode
+	if err := cache.Client.Del(cache.Ctx, cacheKey).Err(); err != nil {
+		fmt.Printf("⚠️ erro ao remover cache da URL %s: %v\n", url.ShortCode, err)
+	}
+
+	return nil
 }
 
 func (service *urlService) DeactivateExpired() (int64, error) {
+	expired, err := service.repo.FindExpiredURLs()
+	if err != nil {
+		return 0, err
+	}
+
 	affected, err := service.repo.DeactivateExpiredURLs()
 	if err != nil {
 		return 0, err
+	}
+
+	for _, exp := range expired {
+		cacheKey := "short:" + exp.ShortCode
+
+		if err := cache.Client.Del(cache.Ctx, cacheKey).Err(); err != nil {
+			fmt.Printf("⚠️ erro ao remover cache expirada %s: %v\n", exp.ShortCode, err)
+		}
 	}
 
 	return affected, nil
