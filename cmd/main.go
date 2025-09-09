@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"guycanella-url-shortner/internal/cache"
 	"guycanella-url-shortner/internal/config"
 	"guycanella-url-shortner/internal/database"
 	"guycanella-url-shortner/internal/handlers"
@@ -23,6 +24,8 @@ func main() {
 	if err := database.Migrate(); err != nil {
 		log.Fatalf("❌ Migration failed: %v", err)
 	}
+
+	cache.InitRedis()
 
 	repo := repository.NewURLRepository()
 	service := services.NewURLService(repo, cfg)
