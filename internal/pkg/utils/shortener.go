@@ -2,7 +2,10 @@ package utils
 
 import (
 	"crypto/rand"
+	"fmt"
 	"math/big"
+
+	"github.com/google/uuid"
 )
 
 const CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -20,4 +23,13 @@ func GenerateShortCode() (string, error) {
 	}
 
 	return string(result), nil
+}
+
+func ParseUUID(id string) (uuid.UUID, error) {
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("invalid UUID: %s", id)
+	}
+
+	return uid, nil
 }
